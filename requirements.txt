@@ -1,0 +1,10 @@
+streamlit==1.28.0
+requests==2.31.0
+moviepy==1.0.3
+pydub==0.25.1
+validators==0.22.0
+transformers==4.34.0
+torch==2.1.0
+ffmpeg-python==0.2.0
+yt-dlp==2023.10.13
+numpy==1.26.0
