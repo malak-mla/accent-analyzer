@@ -112,3 +112,4 @@ def show_results(transcript, accent_result, audio_path):
 # Footer
 st.markdown("---")
 st.caption("Accent Analysis System v1.0 | Uses Whisper and Wav2Vec2 AI models")
+st.write("DEBUG: Video path:", video_path)

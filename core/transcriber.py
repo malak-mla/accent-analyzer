@@ -5,7 +5,7 @@ class Transcriber:
     def __init__(self):
         self.model = pipeline(
             "automatic-speech-recognition",
-            model="openai/whisper-small.en",
+            model="openai/whisper-tiny.en",
             chunk_length_s=30
         )
     
