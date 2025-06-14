@@ -1,4 +1,3 @@
-import numpy as np
 from transformers import pipeline
 from .config import ACCENT_MAP
 
@@ -28,7 +27,8 @@ class AccentScorer:
             "accent": accent_info['label'],
             "confidence": confidence,
             "all_scores": [
-                {"accent": ACCENT_MAP.get(r['label'], r['label']), "score": r['score']}
+                {"accent": ACCENT_MAP.get(r['label'], {"label": r['label']})["label"], 
+                 "score": r['score']}
                 for r in sorted_results
             ]
         }
@@ -36,8 +36,6 @@ class AccentScorer:
     def _calculate_confidence(self, score: float, threshold: float) -> float:
         """Calculate normalized confidence score (0-100%)"""
         if score >= threshold:
-            # Scale from threshold to 1.0 -> 70% to 100%
             return min(100, 70 + 30 * ((score - threshold) / (1.0 - threshold)))
         else:
-            # Scale from 0 to threshold -> 0% to 70%
             return max(0, 70 * (score / threshold))

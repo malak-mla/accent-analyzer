@@ -16,6 +16,45 @@ def load_transcriber():
 def load_scorer():
     return AccentScorer()
 
+def show_results(transcript, accent_result, audio_path):
+    """Display analysis results"""
+    with st.container():
+        st.success("✅ Analysis Complete!")
+        st.audio(audio_path, format="audio/wav")
+        
+        # Language confidence
+        lang_status = "🟢 English" if transcript['is_english'] else "🔴 Non-English"
+        st.subheader(f"Language: {lang_status} (Confidence: {transcript['confidence']*100:.1f}%)")
+        
+        # Accent results
+        st.subheader(f"Accent: {accent_result['accent']}")
+        st.metric("Accent Confidence", f"{accent_result['confidence']:.1f}%")
+        
+        # Confidence visualization
+        with st.expander("Detailed Confidence Scores"):
+            for score in accent_result['all_scores']:
+                st.progress(score['score'], text=f"{score['accent']}: {score['score']*100:.1f}%")
+        
+        # Transcript
+        with st.expander("View Transcript"):
+            st.caption(f"Overall Confidence: {transcript['confidence']*100:.1f}%")
+            st.write(transcript['text'])
+        
+        # Interpretation
+        with st.expander("Interpretation Guide"):
+            st.markdown("""
+            - **85-100%**: Strong accent characteristics
+            - **70-85%**: Clear accent features
+            - **60-70%**: Moderate accent features
+            - **<60%**: Weak or mixed accent characteristics
+            """)
+            st.markdown(f"""
+            **Analysis Summary**:  
+            The speaker demonstrates {'strong' if accent_result['confidence'] > 85 else 'clear' if accent_result['confidence'] > 70 else 'moderate'} 
+            characteristics of a {accent_result['accent']} accent, with an English language confidence of 
+            {transcript['confidence']*100:.1f}%.
+            """)
+
 # Streamlit UI
 st.set_page_config(page_title="🌍 Accent Analyzer", layout="wide")
 st.title("🌍 English Accent Analyzer")
@@ -69,47 +108,6 @@ if st.button("Analyze Accent", type="primary", use_container_width=True):
         status.error(f"❌ Processing error: {str(e)}")
         progress_bar.empty()
 
-def show_results(transcript, accent_result, audio_path):
-    """Display analysis results"""
-    with st.container():
-        st.success("✅ Analysis Complete!")
-        st.audio(audio_path, format="audio/wav")
-        
-        # Language confidence
-        lang_status = "🟢 English" if transcript['is_english'] else "🔴 Non-English"
-        st.subheader(f"Language: {lang_status} (Confidence: {transcript['confidence']*100:.1f}%)")
-        
-        # Accent results
-        st.subheader(f"Accent: {accent_result['accent']}")
-        st.metric("Accent Confidence", f"{accent_result['confidence']:.1f}%")
-        
-        # Confidence visualization
-        with st.expander("Detailed Confidence Scores"):
-            for score in accent_result['all_scores']:
-                label = score['accent']['label'] if isinstance(score['accent'], dict) else score['accent']
-                st.progress(score['score'], text=f"{label}: {score['score']*100:.1f}%")
-        
-        # Transcript
-        with st.expander("View Transcript"):
-            st.caption(f"Overall Confidence: {transcript['confidence']*100:.1f}%")
-            st.write(transcript['text'])
-        
-        # Interpretation
-        with st.expander("Interpretation Guide"):
-            st.markdown("""
-            - **85-100%**: Strong accent characteristics
-            - **70-85%**: Clear accent features
-            - **60-70%**: Moderate accent features
-            - **<60%**: Weak or mixed accent characteristics
-            """)
-            st.markdown(f"""
-            **Analysis Summary**:  
-            The speaker demonstrates {'strong' if accent_result['confidence'] > 85 else 'clear' if accent_result['confidence'] > 70 else 'moderate'} 
-            characteristics of a {accent_result['accent']} accent, with an English language confidence of 
-            {transcript['confidence']*100:.1f}%.
-            """)
-
 # Footer
 st.markdown("---")
 st.caption("Accent Analysis System v1.0 | Uses Whisper and Wav2Vec2 AI models")
-st.write("DEBUG: Video path:", video_path)
